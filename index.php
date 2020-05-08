@@ -1,70 +1,37 @@
-<?php
-include("header.php");
-include("database.php");
-extract($_POST);
-?>
-<html>
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Online Exam Portal</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-    <link href="quiz.css" rel="stylesheet" type="text/css">
-
-
+    <link href="./css/newstyle.css" rel="stylesheet" />
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 </head>
+<body>
 
-<body background="img.jpg" >
-    <table width="100%" border="0">
-        <tr>
-            <td width="70%" height="25">&nbsp;</td>
+    <!-- Sign-In Form -->
+    <div class="container custom-main-content">
+        <h1 class="display-4 text-center">Online Quiz Portal</h1>
+        <form action="testlogin.php" method="post">
+            <div class="form-group">
+                <label for="userid">User ID</label>
+                <input type="text" class="form-control" id="userid" name="user_id"/>
+            </div>
+            <div class="form-group">
+                <label for="pass">Password</label>
+                <input type="password" class="form-control" id="pass" name="pass"/>
+            </div>
+            <div class="text-center form-group">
+                <input type="submit" id="submit" class="btn btn-primary" name="submit"/>
+            <div>
+        </form>
+        <div class="text-center">
+            <small>New User ? <a href="signup.php">Register Here</a></small>
+        </div>
+    </div>
 
-
-        </tr>
-        <tr>
-            <td height="296" valign="top">
-                <div style="margin-left:350px;" align="center">
-                    <h1 class=head1 >Online Quiz Portal</h1>
-                    <form method="post" action="testlogin.php">
-                        <table width="200" border="0">
-                            <tr>
-                                <td><span class="style9">User ID </span></td>
-                                <td><input name="user_id" type="text" id="loginid2" class=input></td>
-                            </tr>
-                            <tr>
-                                <td><span class="style9">Password</span></td>
-                                <td><input name="pass" type="password" id="pass2" class=input></td>
-                            </tr>
-                            <tr>
-                                <td colspan="2">
-                                    <span class="errors">
-                                        <?php
-		                                        if(isset($found))
-		                                        {
-                                                echo "Invalid Username or Password";
-                                            }
-                                        ?>
-                                    </span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td colspan=2 align=center class="errors">
-                                    <input name="submit" type="submit" id="submit" value="Login"> </td>
-                            </tr>
-                            <tr>
-                                <td colspan="2">
-                                    <div align="center"><span class="style4">New User ? <a href="signup.php">Register
-                                                Here</a></span></div>
-                                </td>
-                            </tr>
-                        </table>
-                    </form>
-                </div>
-            </td>
-            <td valign="top">
-            </td>
-        </tr>
-    </table>
-
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
 </body>
-
 </html>
