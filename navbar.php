@@ -22,9 +22,6 @@ function createNavbar($currId){
             </ul>
         </div>
     </nav>
-    <?php
-    echo "$currId";
-    ?>
     <script>
         let currId = <?php echo "$currId" ?>;
         let ele = document.getElementById(currId.id);
