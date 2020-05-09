@@ -1,35 +1,70 @@
 <?php
 session_start();
+include("database.php");
+extract($_SESSION);
+function create_table($rs){
+    ?>
+    <table class="table table-striped">
+        <thead>
+            <th>Test ID</th>
+            <th>Test Date</th>
+            <th>Total Question</th> 
+            <th>Attempted</th>
+            <th>Correct</th>
+            <th>Score</th>
+        </thead>
+        <?php
+        while($row=mysqli_fetch_row($rs))
+        {
+        ?>
+            <tr>
+                <td><?php echo $row[1]?></td>
+                <td><?php echo $row[2]?></td>
+                <td><?php echo $row[3]?></td>
+                <td><?php echo $row[4]?></td>
+                <td><?php echo $row[5]?></td>
+                <td><?php echo $row[6]?></td>
+            </tr>
+        <?php
+        }
+        ?>
+    </table>
+<?php    
+}
 ?>
 
 <html>
 
 <head>
-    <title>Online Quiz - Result </title>
-    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-    <link href="quiz.css" rel="stylesheet" type="text/css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Results</title>
+    <link href="./css/newstyle.css" rel="stylesheet" />
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 </head>
 
-<body background="img.jpg">
-    <?php
-include("header.php");
-include("database.php");
-extract($_SESSION);
-$rs=mysqli_query($cn,"select * from Result  where user_id=$_SESSION[user_id]") or die(mysqli_error());
+<body>
 
-echo "<h1 class=head1> Result </h1>";
-if(mysqli_num_rows($rs)<1)
-{
-	echo "<br><br><h1 class=head1> You have not given any quiz</h1>";
-	exit;
-}
-echo "<table border=1 align=center class=style9><tr><td width=300 align=center>Test ID <td> Test Date<td> Total Questions <td>Attempted<td> Correct<td> Score";
-while($row=mysqli_fetch_row($rs))
-{
-echo "<tr class=style9><td align=center>$row[1] <td align=center> $row[2] <td align=center> $row[3] <td align=center> $row[4]<td align=center> $row[5] <td align=center> $row[6]";
-}
-echo "</table>";
-?>
+    <?php
+    include("navbar.php");
+    createNavbar('results');
+    ?>
+
+    <!-- Results -->
+    <div class="container">
+        <h1 class="display-4 text-center">Result</h1>
+        <?php
+            $rs=mysqli_query($cn,"select * from Result  where user_id=$_SESSION[user_id]") or die(mysqli_error());
+            create_table($rs);
+        ?>
+    <div>
+
+
+    <!-- BootStrap Required Scripts -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
 </body>
 
 </html>

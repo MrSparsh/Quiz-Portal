@@ -1,61 +1,79 @@
-
-<html>
-<head>
-<title>New User Signup </title>
-<script language="javascript">
-function check()
-{
- 
-  if(document.form1.pass.value!=document.form1.cpass.value)
-  {
-    alert("Confirm Password does not matched");
-	document.form1.cpass.focus();
-	return false;
-  }
-}
-  
-</script>
-<link href="quiz.css" rel="stylesheet" type="text/css">
-</head>
-
-<body background="img.jpg">
 <?php
-include("header.php");
+    include("database.php");
+    extract($_POST);
+    if(isset($Submit)){
+        $rs=mysqli_query($cn,"select * from User where user_id='$user_id' ");
+        if (mysqli_num_rows($rs)>0)
+        {
+            ?>
+            <script type='text/javascript'>
+                alert("UserId Already Exists");
+            </script>
+            <?php
+        }else{
+            $query="insert into User values('$user_id','$pass','$name')";
+            $rs=mysqli_query($cn,$query)or die("Could Not Perform the Query");
+            ?>
+            <script type='text/javascript'>
+                alert("UserID Created Successfully");
+                document.location.href = 'index.php';
+            </script>
+            <?php
+        }
+    }
 ?>
- <table width="100%" border="0">
-   <tr>
-     <td width="132" rowspan="2" valign="top"><span class="style8"></span></td>
-     <td width="468" height="57"></td>
-   </tr>
-   <tr>
-    <h1 align="center"><span class="head1">New User Signup</span></h1>
-     <td><form name="form1" method="post" action="signupuser.php" onSubmit="return check();">
-       <table width="301" border="0" align="left">
-         <tr>
-           <td><div align="left" class="style9">User ID </div></td>
-           <td><input type="text" name="uid" class=input required></td>
-         </tr>
-         <tr>
-           <td class="style9">Password</td>
-           <td><input type="password" name="pass"  class=input required></td>
-         </tr>
-         <tr>
-           <td class="style9">Confirm Password </td>
-           <td><input name="cpass" type="password" id="cpass" class=input required></td>
-         </tr>
-         <tr>
-           <td class="style9">Name </td>
-           <td><input name="name" type="text" id="name" class=input required></td>
-         </tr>
-         <tr> 
-           <td>&nbsp;</td>
-           <td><input type="submit" name="Submit" value="Signup" >
-           </td>
-         </tr>
-       </table>
-     </form></td>
-   </tr>
- </table>
- <p>&nbsp; </p>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script language="javascript">
+  function check()
+  {
+    if(document.form1.pass.value!==document.form1.cpass.value)
+    {
+      alert("Confirm Password does not matched");
+      document.form1.cpass.focus();
+      return false;
+    }
+  }
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Signup</title>
+  <link href="./css/newstyle.css" rel="stylesheet" />
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+</head>
+<body>
+
+    <!-- Sign-Up Form -->
+    <div class="container custom-main-content">
+        <h1 class="display-4 text-center">Online Quiz Portal</h1>
+        <form name="form1" method="post" action="" onSubmit="return check();">
+            <div class="form-group">
+                <label for="userid">User ID</label>
+                <input type="text" class="form-control" id="userid" name="user_id"/>
+            </div>
+            <div class="form-group">
+                <label for="pass">Password</label>
+                <input type="password" class="form-control" id="pass" name="pass"/>
+            </div>
+            <div class="form-group">
+                <label for="cpass">Confirm Password</label>
+                <input type="password" class="form-control" id="cpass" name="cpass"/>
+            </div>
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" class="form-control" id="name" name="name"/>
+            </div>
+            <div class="text-center form-group">
+                <input type="submit" id="submit" class="btn btn-primary" name="Submit" value="Sign Up"/>
+            <div>
+        </form>
+    </div>
+
+    <!-- BootStrap Required Scripts -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
 </body>
 </html>

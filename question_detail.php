@@ -2,152 +2,58 @@
 	session_start();
 	include_once("database.php");
 	extract($_SESSION);
-
-	if(isset($_POST))
-	{
-		extract($_POST);
-		$_SESSION['ques_id']=$ques_id;
+	extract($_POST);
+	if(isset($_POST['ques_id'])){
+		$_SESSION['ques_id']=$_POST['ques_id'];
 	}
-	$test_id = $_SESSION['test_id'];
-	$duration=mysqli_query($cn,"select duration from Test where test_id=$_SESSION[test_id]");
-	$duration = mysqli_fetch_row($duration);
-	$duration = $duration[0];
-	$duration = $duration*60;
-	$uniqTimerId = "".$test_id;
-	$uniqTimerId.=$_SESSION['user_id'];
-	echo "
-		<div id='divCounter' align=\"right\" style=\"font-size:50px;color:white\"></div>
-		<br/>
-		<script>
-			if(localStorage.getItem('$uniqTimerId')){
-					var value = localStorage.getItem('$uniqTimerId');
-			}else{
-				var value = $duration;
-				localStorage.setItem('$uniqTimerId', $duration);
-			}
-			var interval = setInterval(function (){counter('$uniqTimerId');}, 1000);
-    </script>";
-			$ques_rs=mysqli_query($cn,"select * from Question where test_id=$_SESSION[test_id] and ques_id = $_SESSION[ques_id]");
-			$ques_count=mysqli_query($cn,"select * from Question where test_id=$_SESSION[test_id]");
-			$count=mysqli_num_rows($ques_count);
-			$ques_row= mysqli_fetch_row($ques_rs);
-			$res=mysqli_query($cn,"select * from UserAnswer where user_id='$_SESSION[user_id]' AND test_id=$_SESSION[test_id] AND ques_id=$_SESSION[ques_id]");
-			$x=0;
-			if(mysqli_num_rows($res)>0)
-			{
-				$ans_row=mysqli_fetch_row($res);
-				$x=1;
-			}
+	?>
+		<?php
+			$res=mysqli_query($cn,"select start_timestamp from usertest where user_id='$_SESSION[user_id]' AND test_id=$_SESSION[test_id]");
+			$start_timestamp = mysqli_fetch_row($res);
+			$start_timestamp = $start_timestamp[0];
+			$res=mysqli_query($cn,"select Duration from test where test_id=$_SESSION[test_id]");
+			$duration = mysqli_fetch_row($res);
+			$duration = $duration[0];
 
-			echo "<p class=style9 style=\"margin-left:26px;\">$ques_row[0].  $ques_row[2]</p>";
-			$opt_rs = mysqli_query($cn,"select * from Options where test_id=$_SESSION[test_id]  AND ques_id=$ques_row[0]");
-			$img_rs= mysqli_query($cn,"select * from Images where test_id=$_SESSION[test_id]  AND ques_id=$ques_row[0]");
-			$tbl_rs= mysqli_query($cn,"select * from Tables where test_id=$_SESSION[test_id]  AND ques_id=$ques_row[0] order by table_num");
-			
-			echo '<form name="form1" method="post" action="question_detail.php">';
-			//Print Images
-			while($img_row=mysqli_fetch_row($img_rs))
-			{
+			$secondsPassed = time() - $start_timestamp;
+			$allowedSeconds = $duration*60;
+			if($secondsPassed > $allowedSeconds){	
+		?>
+				<script type='text/javascript'>
+					alert("Test is over");
+                    document.location.href = 'testlogin.php';
+                </script>
+        <?php
+			}
+			$secondsLeft = $allowedSeconds - $secondsPassed;
 
-						$path = $img_row[3];
-						echo '<img  height="170" width="200" hspace="20px" src="'.$path.'.jpeg" />';					
-			}
-			
-			//Print Table
-			$table_cnt = mysqli_query($cn,"select max(table_num) from Question_tables where test_id=$_SESSION[test_id]  AND ques_id=$ques_row[0]");
-			
-			$table_cnt = mysqli_fetch_row($table_cnt);
-			if($table_cnt){
-				$table_cnt = $table_cnt[0];
-			}else{
-				$table_cnt=-1;
-			}
-				for($i=0;$i<=$table_cnt ;$i++){
-				$row_cnt = mysqli_query($cn,"select max(row_num) from Question_tables where test_id=$_SESSION[test_id]  AND ques_id=$ques_row[0] and table_num=$i");
-				$row_cnt = mysqli_fetch_row($row_cnt);
-				$row_cnt = $row_cnt[0];
-				$col_cnt = mysqli_query($cn,"select max(column_num) from Question_tables where test_id=$_SESSION[test_id]  AND ques_id=$ques_row[0] and table_num=$i");
-				$col_cnt = mysqli_fetch_row($col_cnt);
-				$col_cnt = $col_cnt[0];
-				$table_rs = mysqli_query($cn,"select row_num,column_num,data from Question_tables where test_id=$_SESSION[test_id]  AND ques_id=$ques_row[0] and table_num=$i");
-				$table = array();
-				for($row_num=0;$row_num<=$row_cnt;$row_num++){
-					$row=array();
-					for($col_num=0;$col_num<=$col_cnt;$col_num++){
-						$row[]='';
-					}
-					$table[]=$row;
-				}
-					while($tabledata_row=mysqli_fetch_row($table_rs)){
-					$table[$tabledata_row[0]][$tabledata_row[1]] = $tabledata_row[2];			
-				}
-				$tab='<p style="margin-left:20px;"><table border="4" cellpadding="8">';
-					for($i=0;$i<sizeof($table);$i++){
-									$tab.='<tr class=style9 >';
-									for($j=0;$j<sizeof($table[$i]);$j++){
-													$data=$table[$i][$j];
-													$tab.='<td>';
-													$tab.=$data;
-													$tab.='</td>';
-									}
-									$tab.='</tr>';
-						}
-					$tab.='</table></p>';
-					echo $tab;
-					echo '<br>';
-			}
-			
-			//Print Options
-			while($option_row=mysqli_fetch_row($opt_rs)){
+		?>
+	<script type="text/javascript">
+		let secondsLeft = <?php echo $secondsLeft ?>;
+		var counter = function (refreshId){
+		if(secondsLeft <=0){
+				alert("Test is over");
+				document.getElementById('endTestButton').click();
+				clearInterval(refreshId);
 				
-				if($x==1 && $option_row[2]==$ans_row[3])
-				{
-					echo "	<label class=container> $option_row[3]<input type=radio name='ans' value=$option_row[2] checked style=\"padding-left:4px\"><span  class=checkmark></span>
-					</label> ";
-				}else
-					echo "<label class=container> $option_row[3]<input type=radio name='ans' value=$option_row[2] style=\"padding-left:4px\" ><span class=checkmark></span>
-					</label> ";
-				echo nl2br("\n");
-			}
-			echo '<input type=submit name="submit1" value="Submit" >';
-			echo '<input type=submit name="reset" value="Reset" >';
-			echo '</form>';
-
-
-
-			
-			if($_SESSION['ques_id']!=$count)
-			echo '<form name="form1" method="post" action="question_detail.php">
-			<table width="200" border="0" align="center">
-			  <tr>
-			  <input type=number name=ques_id value='.(min((int)$_SESSION["ques_id"]+1,$count)).' hidden>
-			  <input type=submit name=submit value="Next Question" onclick="alert(timer);display.value=timer;">
-			  </tr>
-			  </table>
-			</form>';
-			
-			if($_SESSION['ques_id']!=1)
-			echo '<form name="form1" method="post" action="question_detail.php">
-			<table width="200" border="0" align="center">
-			  <tr>
-			  <input type=number name=ques_id value='.(max((int)$_SESSION["ques_id"]-1,1)).' hidden>
-			  <input type=submit name=submit value="Previous Question">
-			  </tr>
-			</table>
-			</form>';
-			
-			echo '<form name="form1" method="post" action="question_detail.php">
-			<table width="200" border="0" align="center">
-			  <tr>
-			  <input type=submit id="endTestButton" name=ENDTEST value="END TEST">
-			  </tr>
-			</table>
-			</form>';
-			
+		}else{
+			secondsLeft = secondsLeft-1;
+		}
+		let min = Math.floor(secondsLeft/60);
+		let sec = secondsLeft%60;
+		document.getElementById('divCounter').innerHTML = ""+min+" : "+sec;
+		};
+		
+		let refreshId = setInterval(() => counter(refreshId),1000);
+	</script>
+	<?php
 	if (isset($_POST['ENDTEST']))
 	{
 		$correct=0;
 		$attempted=0;
+		$count = mysqli_query($cn,"select count(*) from question where test_id=$_SESSION[test_id]");
+        $count = mysqli_fetch_row($count);
+        $count = $count[0];
 		$res_row=mysqli_query($cn,"select * from UserAnswer where user_id='$_SESSION[user_id]' AND test_id=$_SESSION[test_id]");
 		while($res_row1=mysqli_fetch_row($res_row))
 		{
@@ -169,26 +75,22 @@
 		mysqli_query($cn,"insert into Result values('$_SESSION[user_id]',$_SESSION[test_id],'$date',$count,$attempted,$correct,$marks)");
 		echo "<script>document.location.href = 'testlogin.php';</script>";
 	}
-	if (isset($_POST['submit1'])) {
+	if (isset($_POST['submit'])) {
 		if(isset($_POST['ans']))
 		{
 			$res=mysqli_query($cn,"select * from UserAnswer where user_id='$_SESSION[user_id]' AND test_id=$_SESSION[test_id] AND ques_id=$_SESSION[ques_id]");
 			if(mysqli_num_rows($res)>0){
-			$res=mysqli_query($cn,"update UserAnswer set user_ans=$_POST[ans] where user_id='$_SESSION[user_id]' AND test_id=$_SESSION[test_id] AND ques_id=$_SESSION[ques_id]");
-		    
+			$res=mysqli_query($cn,"update UserAnswer set user_ans=$_POST[ans] where user_id='$_SESSION[user_id]' AND test_id=$_SESSION[test_id] AND ques_id=$_SESSION[ques_id]");  
 		   }
 			else
 			$res=mysqli_query($cn,"insert into UserAnswer values ('$_SESSION[user_id]',$_SESSION[test_id],$_SESSION[ques_id],$_POST[ans])");
 		}
-		echo "<script>document.location.href = 'question_detail.php';</script>";
 	}
 	if (isset($_POST['reset'])) {
 		if(isset($_POST['ans']))
 		{
 			$res=mysqli_query($cn,"delete from UserAnswer where user_id='$_SESSION[user_id]' AND test_id=$_SESSION[test_id] AND ques_id=$_SESSION[ques_id]");
-			$x=0;  
 		}
-		echo "<script>document.location.href = 'question_detail.php';</script>";
 	}
 		
 ?>
@@ -196,29 +98,54 @@
 <html>
 
 <head>
-		<title>Ongoing Quiz</title>
+	<title>Quiz</title>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-    <link href="quiz.css" rel="stylesheet" type="text/css">
+	<link href="./css/newstyle.css" rel="stylesheet" />
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 </head>
 
-<body background="img.jpg">
+<body>
+	<div id='divCounter'></div>
+	<div class="container  custom-main-content">
+		<br/>
+		<form method="post" action="question_detail.php">
+			<?php	
+				include('displayHelper.php');
+				showQuestion($cn,$_SESSION['test_id'],$_SESSION['ques_id']);
+				showImages($cn,$_SESSION['test_id'],$_SESSION['ques_id']);
+				showTables($cn,$_SESSION['test_id'],$_SESSION['ques_id']);
+				showOptions($cn,$_SESSION['user_id'],$_SESSION['test_id'],$_SESSION['ques_id']);
+			?>
+			<input type="submit" name="submit" value="Submit" />
+			<input type="submit" name="reset" value="Reset" />
+		</form>
+		<form method="post" action="question_detail.php">
+	<?php
+		$ques_count=mysqli_query($cn,"select * from Question where test_id=$_SESSION[test_id]");
+		$count=mysqli_num_rows($ques_count);
+		if($_SESSION['ques_id']!=$count){
+		?>
+			<input type=number name=ques_id value=<?php echo min((int)$_SESSION["ques_id"]+1,$count)?> hidden>
+			<input type=submit name=next value="Next Question" ">
+		<?php
+		}
+		if($_SESSION['ques_id']!=1){
+		?>
+			<input type=number name=ques_id value=<?php echo max((int)$_SESSION["ques_id"]-1,1) ?> hidden>
+			<input type=submit name=prev value="Previous Question">
+		<?php
+		}
+		?>	
+		</form>
+		<form name="form1" method="post" action="question_detail.php">
+			<input type=submit id="endTestButton" name=ENDTEST value="END TEST">
+		</form>
+  	<div>
 
-		<div id="divCounter"></div>
-    <br/>
-		<script type="text/javascript">
-    var counter = function (str){
-      if(value <=0){
-				document.getElementById("endTestButton").click();
-				localStorage.clear();
-      }else{
-        value = parseInt(value)-1;
-        localStorage.setItem(str, value);
-      }
-      var min = Math.floor(value/60);
-      var sec = value%60;
-      document.getElementById('divCounter').innerHTML = ""+min+" : "+sec;
-    };
-  </script>
+  <!-- BootStrap Required Scripts -->
+  	<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
 </body>
 
 </html>

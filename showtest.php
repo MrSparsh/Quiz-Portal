@@ -10,7 +10,6 @@ session_start();
 </head>
 <body>
 <?php
-include("header.php");
 include("database.php");
 extract($_GET);
 $rs1=mysqli_query($cn,"select * from mst_subject where sub_id=$subid");

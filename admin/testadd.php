@@ -12,8 +12,6 @@ if (!isset($_SESSION['alogin']))
 <?php
 require("../database.php");
 
-include("header.php");
-
 
 echo "<br><h2><div  class=head1>Add Quiz</div></h2>";
 ?>

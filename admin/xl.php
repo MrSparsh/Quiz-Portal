@@ -1,7 +1,6 @@
 <?php
 session_start();
 require("../database.php");
-include("header.php");
 error_reporting(0);
 extract($_SESSION);
 include('Classes/PHPExcel.php');

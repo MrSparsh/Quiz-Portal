@@ -1,23 +1,54 @@
 <?php
-  session_start();
-
-  include("database.php");
-  extract($_POST);
-  if(isset($submit))
-  {
-    $rs=mysqli_query($cn,"select * from User where user_id='$user_id' and pass='$pass' ");
-    if(mysqli_num_rows($rs)<1)
+    session_start();
+    include_once("database.php");
+    extract($_SESSION);
+    extract($_POST);
+    if(isset($submit1))
     {
-          $found="N";
-          echo "<script>alert('Invalid Details');document.location.href = 'index.php';</script>";
+        $test_id = $_POST['test_id'];
+        $test_password = $_POST['test_password'];
+        $rs=mysqli_query($cn,"select * from Test where test_id=$test_id and test_password='$test_password' ");
+        if(mysqli_num_rows($rs)<1)
+        {
+            ?>
+            <script type='text/javascript'>
+                alert('Invalid Details');
+            </script>
+            <?php
+        }else{
+            $res=mysqli_query($cn,"select * from result where test_id=$test_id and user_id='$_SESSION[user_id]' ");
+            if(mysqli_num_rows($res)>0){
+            $test_row=mysqli_fetch_row($res);
+            $date=date("Y-m-d");
+            $val=strcmp($test_row[2],$date);
+            if($val==0)
+            {
+                ?>
+                <script type='text/javascript'>
+                    let message = "You have already given the test. You can't login again";
+                    alert(message);
+                </script>
+                <?php
+            }
+            }else{
+                $_SESSION['ques_id'] =1;
+                $_SESSION['test_id']=$test_id;
+                $timestamp = time();
+		        $res=mysqli_query($cn,"select test_id from usertest where user_id='$_SESSION[user_id]'");
+                if(mysqli_num_rows($res)==0){
+                    mysqli_query($cn,"insert into usertest values('$_SESSION[user_id]',$_SESSION[test_id],now(),$timestamp)");
+                }
+                ?>
+                <script type='text/javascript'>
+                    document.location.href = 'question_detail.php';
+                </script>
+                <?php
+            }
+        }
     }
-    else
-    {
-      $name=mysqli_fetch_row($rs);
-      $_SESSION['name']=$name[2];
-      $_SESSION['user_id']=$user_id;
-    }
-  }
+?>
+<?php
+	
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -29,32 +60,15 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 </head>
 <body>
-    <!-- Nav Bar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#">MNNIT Quiz Portal</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav ml-auto">
-            <li class="nav-item active">
-                <a class="nav-link" href="testlogin.php">Home <span class="sr-only">(current)</span></a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="result.php">Results</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="signout.php">Signout</a>
-            </li>
-            </ul>
-        </div>
-    </nav>
-
+    
+    <?php
+    include("navbar.php");
+    createNavbar('home');
+    ?>
 
     <!-- Test Form -->
     <div class="container custom-main-content">
-        <form action="quiz.php" method="post">
+        <form action="" method="post">
             <div class="form-group">
                 <label for="userid">Test ID</label>
                 <input type="text" class="form-control" id="test_id" name="test_id"/>
