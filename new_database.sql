@@ -84,7 +84,6 @@ create table Images(
     PRIMARY KEY (test_id,ques_id,img_num)
 );
 
-
 CREATE TABLE UserAnswer (
   `user_id` varchar(20) NOT NULL,
   `test_id` int NOT NULL,
@@ -92,3 +91,12 @@ CREATE TABLE UserAnswer (
   `user_ans` int NOT NULL,
    PRIMARY Key (user_id,test_id,ques_id) 
 );
+
+CREATE TABLE usertest(
+  `user_id` varchar(20) NOT NULL,
+  `test_id` int(20) NOT NULL,
+  `start_time` timestamp NOT NULL,
+  `start_timestamp` int(20) NOT NULL,
+  PRIMARY KEY (user_id,test_id)
+) 
+
