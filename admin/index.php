@@ -1,37 +1,66 @@
 <?php
-session_start()
+    session_start();
+    include("database.php");
+    extract($_POST);
+    if(isset($submit))
+    {
+        $rs=mysqli_query($cn,"select * from admin where loginid='$loginid' and pass='$pass' ");
+        if(mysqli_num_rows($rs)<1)
+        {
+            ?>
+            <script type="text/javascript">
+                alert("Invalid Details");
+            </script>
+            <?php
+        }
+        else
+        {
+            $name=mysqli_fetch_row($rs);
+            $_SESSION['alogin']="true";
+            $_SESSION['loginid']=$loginid;
+            ?>
+            <script type="text/javascript">
+                window.location="login.php";
+            </script>
+            <?php
+        }
+    }
 ?>
-
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Exam Portal</title>
+    <link href="./css/newstyle.css" rel="stylesheet" />
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+</head>
+<body>
 
-    <title>ADMIN LOGIN</title>
+    <!-- Sign-In Form -->
+    <div class="container custom-main-content">
+        <h1 class="display-4 text-center">Online Quiz Portal</h1>
+        <form action="" method="post">
+            <div class="form-group">
+                <label for="loginid">Faculty ID</label>
+                <input type="text" class="form-control" id="loginid" name="loginid"/>
+            </div>
+            <div class="form-group">
+                <label for="pass">Password</label>
+                <input type="password" class="form-control" id="pass" name="pass"/>
+            </div>
+            <div class="text-center form-group">
+                <input type="submit" id="submit" class="btn btn-primary" name="submit"/>
+            <div>
+        </form>
+        <div class="text-center">
+            <small>New User ? <a href="signup.php">Register Here</a></small>
+        </div>
+    </div>
 
-    <!-- Bootstrap core CSS -->
-    <link href="css/boot.css" rel="stylesheet">
-
-    <!-- Custom styles for this template -->
-    <link href="css/sign.css" rel="stylesheet">
-  </head>
-
-  <body class="text-center">
-    <form class="form-signin" name="form1" method="post" action="login.php">
-      <h1 class="h3 mb-3 font-weight-normal">ADMIN LOGIN</h1>
-      <label for="inputEmail" class="sr-only">Email address</label>
-      <input type="text" id="inputEmail" name="loginid" id="loginid" class="form-control" placeholder="Username" required autofocus>
-      <label for="inputPassword" class="sr-only">Password</label>
-      <input type="password" name="pass" id="pass" class="form-control" placeholder="Password" required>
-      <div class="checkbox mb-3">
-        <label>
-          <input type="checkbox" value="remember-me"> Remember me
-        </label>
-      </div>
-      <button class="btn btn-lg btn-primary btn-block" type="submit" name="submit" id="submit">Login</button>
-      <p class="mt-5 mb-3 text-muted">Designed By: CS-B (Group 21) </p>
-    </form>
-  </body>
+    <!-- BootStrap Required Scripts -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+</body>
 </html>

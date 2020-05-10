@@ -28,32 +28,6 @@ error_reporting(1);
 
 <body>
     <?php
-extract($_POST);
-if(isset($submit))
-{
-	include("../database.php");
-	$rs=mysqli_query($cn,"select * from Admin where loginid='$loginid' and pass='$pass'") or die(mysqli_error());
-	if(mysqli_num_rows($rs)<1)
-	{
-		echo "<BR><BR><BR><BR><div class=head1> Invalid User Name or Password<div>";
-		exit;
-		
-	}
-    $_SESSION['alogin']="true";
-    $_SESSION['loginid']=$loginid;
-	
-}
-else if(!isset($_SESSION[alogin]))
-{
-	echo "<BR><BR><BR><BR><div class=head1> Your are not logged in<br> Please <a href=index.php>Login</a><div>";
-		exit;
-}
-?>
-
-    <table width="100%">
-        <tr>
-            <td aling=right>
-                <?php
 	if(isset($_SESSION['alogin']))
 	{
 	 echo "<div align=\"right\" class=\"style10\"><strong><a href=\"login.php\">Home </a>|<a href=\"signout.php\"> Signout...</a></strong></div>";
