@@ -34,7 +34,7 @@
                 $_SESSION['ques_id'] =1;
                 $_SESSION['test_id']=$test_id;
                 $timestamp = time();
-		        $res=mysqli_query($cn,"select test_id from usertest where user_id='$_SESSION[user_id]'");
+		        $res=mysqli_query($cn,"select test_id from usertest where user_id='$_SESSION[user_id]' and test_id='$_SESSION[test_id]'");
                 if(mysqli_num_rows($res)==0){
                     mysqli_query($cn,"insert into usertest values('$_SESSION[user_id]',$_SESSION[test_id],now(),$timestamp)");
                 }
