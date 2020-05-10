@@ -7,45 +7,7 @@
 		$_SESSION['ques_id']=$_POST['ques_id'];
 	}
 	?>
-		<?php
-			$res=mysqli_query($cn,"select start_timestamp from usertest where user_id='$_SESSION[user_id]' AND test_id=$_SESSION[test_id]");
-			$start_timestamp = mysqli_fetch_row($res);
-			$start_timestamp = $start_timestamp[0];
-			$res=mysqli_query($cn,"select Duration from test where test_id=$_SESSION[test_id]");
-			$duration = mysqli_fetch_row($res);
-			$duration = $duration[0];
 
-			$secondsPassed = time() - $start_timestamp;
-			$allowedSeconds = $duration*60;
-			if($secondsPassed > $allowedSeconds){	
-		?>
-				<script type='text/javascript'>
-					alert("Test is over");
-                    document.location.href = 'testlogin.php';
-                </script>
-        <?php
-			}
-			$secondsLeft = $allowedSeconds - $secondsPassed;
-
-		?>
-	<script type="text/javascript">
-		let secondsLeft = <?php echo $secondsLeft ?>;
-		var counter = function (refreshId){
-		if(secondsLeft <=0){
-				alert("Test is over");
-				document.getElementById('endTestButton').click();
-				clearInterval(refreshId);
-				
-		}else{
-			secondsLeft = secondsLeft-1;
-		}
-		let min = Math.floor(secondsLeft/60);
-		let sec = secondsLeft%60;
-		document.getElementById('divCounter').innerHTML = ""+min+" : "+sec;
-		};
-		
-		let refreshId = setInterval(() => counter(refreshId),1000);
-	</script>
 	<?php
 	if (isset($_POST['ENDTEST']))
 	{
@@ -95,19 +57,32 @@
 		
 ?>
 
+
+
+
 <html>
 
 <head>
 	<title>Quiz</title>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 	<link href="./css/newstyle.css" rel="stylesheet" />
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+	<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 </head>
 
 <body>
-	<div id='divCounter'></div>
+
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">MNNIT Quiz Portal</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+		<span class="navbar-brand ml-auto" href="testlogin.php" id='divCounter'></span>
+    </nav>
+	<!-- <div class="text-center">
+		<div id='divCounter'><h4>Time Remaining  Loading...</h4></div>
+	</div> -->
 	<div class="container  custom-main-content">
-		<br/>
+		
 		<form method="post" action="question_detail.php">
 			<?php	
 				include('displayHelper.php');
@@ -116,31 +91,97 @@
 				showTables($cn,$_SESSION['test_id'],$_SESSION['ques_id']);
 				showOptions($cn,$_SESSION['user_id'],$_SESSION['test_id'],$_SESSION['ques_id']);
 			?>
-			<input type="submit" name="submit" value="Submit" />
-			<input type="submit" name="reset" value="Reset" />
+		<div class="row "> 
+			<div class="col-sm">
+				<input type="submit" name="submit" value="Submit" class="btn btn-success  btn-block"/>
+			</div>
+			<div class="col-sm">
+				<input type="submit" name="reset" value="Reset" class="btn btn-primary btn-block"/>
+			</div>
+		</div>
 		</form>
-		<form method="post" action="question_detail.php">
+		
+			<div class="row">
 	<?php
-		$ques_count=mysqli_query($cn,"select * from Question where test_id=$_SESSION[test_id]");
-		$count=mysqli_num_rows($ques_count);
-		if($_SESSION['ques_id']!=$count){
-		?>
-			<input type=number name=ques_id value=<?php echo min((int)$_SESSION["ques_id"]+1,$count)?> hidden>
-			<input type=submit name=next value="Next Question" ">
-		<?php
-		}
 		if($_SESSION['ques_id']!=1){
 		?>
-			<input type=number name=ques_id value=<?php echo max((int)$_SESSION["ques_id"]-1,1) ?> hidden>
-			<input type=submit name=prev value="Previous Question">
+			<div class="col-sm">
+				<form method="post" action="question_detail.php">
+					<input type=number name=ques_id value=<?php echo max((int)$_SESSION["ques_id"]-1,1) ?> hidden />
+					<input type=submit name=prev value="Previous Question" class="btn btn-secondary btn-block" />
+				</form>	
+			</div>
 		<?php
 		}
+		$ques_count=mysqli_query($cn,"select * from Question where test_id=$_SESSION[test_id]");
+		$count=mysqli_num_rows($ques_count);
+		if($_SESSION['ques_id']!=$count){ ?>
+			
+			<div class="col-sm">
+				<form method="post" action="question_detail.php">
+					<input type=number name=ques_id value=<?php echo min((int)$_SESSION["ques_id"]+1,$count)?> hidden />
+					<input type=submit name=next value="Next Question" class="btn btn-secondary btn-block" />
+				</form>
+			</div>
+			
+		<?php 
+		}
 		?>	
-		</form>
+			</div>
+		
 		<form name="form1" method="post" action="question_detail.php">
-			<input type=submit id="endTestButton" name=ENDTEST value="END TEST">
+			<div class="row">
+				<div class="col-sm">
+					<input type=submit id="endTestButton" name=ENDTEST value="END TEST" class="btn btn-danger btn-block">
+				</div>
+			</div>	
 		</form>
+		
   	<div>
+
+	  <?php
+			$res=mysqli_query($cn,"select start_timestamp from usertest where user_id='$_SESSION[user_id]' AND test_id=$_SESSION[test_id]");
+			$start_timestamp = mysqli_fetch_row($res);
+			$start_timestamp = $start_timestamp[0];
+			$res=mysqli_query($cn,"select Duration from test where test_id=$_SESSION[test_id]");
+			$duration = mysqli_fetch_row($res);
+			$duration = $duration[0];
+
+			$secondsPassed = time() - $start_timestamp;
+			$allowedSeconds = $duration*60;
+			if($secondsPassed > $allowedSeconds){	
+		?>
+				<script type='text/javascript'>
+					alert("Test is over");
+                    document.location.href = 'testlogin.php';
+                </script>
+        <?php
+			}
+			$secondsLeft = $allowedSeconds - $secondsPassed;
+
+		?>
+	<script type="text/javascript">
+		let secondsLeft = <?php echo $secondsLeft ?>;
+		var counter = function (){
+			if(secondsLeft <=0){
+				alert("Test is over");
+				document.getElementById('endTestButton').click();
+				return;
+					
+			}else{
+				secondsLeft = secondsLeft-1;
+			}
+			let min = (Math.floor(secondsLeft/60)%60);
+			let hours = Math.floor(secondsLeft/3600);
+			let sec = secondsLeft%60;
+			if(min<10) min='0'+min;
+			if(sec<10) sec='0'+sec;
+			let timeLeft = hours>0 ? `${hours}h : ${min}m : ${sec}s` : `${min}m : ${sec}s`;
+			document.getElementById('divCounter').innerHTML = timeLeft;
+			setTimeout(counter,1000);
+		};
+		counter();
+	</script>
 
   <!-- BootStrap Required Scripts -->
   	<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
