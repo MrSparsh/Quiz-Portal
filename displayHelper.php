@@ -1,13 +1,11 @@
 <?php
 include('database.php');
     function showTables($cn,$test_id,$ques_id){
-        $table_cnt = mysqli_query($cn,"select max(table_num) from Question_tables where test_id=$test_id and ques_id=$ques_id");	
-        $table_cnt = mysqli_fetch_row($table_cnt);
-        if($table_cnt){
-            $table_cnt = $table_cnt[0];
-        }else{
-            $table_cnt=-1;
-        }
+        $rs = mysqli_query($cn,"select table_num from Question_tables where test_id=$test_id and ques_id=$ques_id");
+        if(mysqli_num_rows($rs)==0) return;	
+        $rs = mysqli_query($cn,"select max(table_num) from Question_tables where test_id=$test_id and ques_id=$ques_id");	
+        $table_cnt = mysqli_fetch_row($rs);
+        $table_cnt = $table_cnt[0];
         for($i=0;$i<=$table_cnt ;$i++){
             $row_cnt = mysqli_query($cn,"select max(row_num) from Question_tables where test_id=$test_id  AND ques_id=$ques_id and table_num=$i");
             $row_cnt = mysqli_fetch_row($row_cnt);
@@ -28,10 +26,10 @@ include('database.php');
                 $table[$tabledata_row[0]][$tabledata_row[1]] = $tabledata_row[2];			
             }
             $tab='<table class="table table-striped">';
-            for($i=0;$i<sizeof($table);$i++){
+            for($j=0;$j<sizeof($table);$j++){
                 $tab.='<tr>';
-                for($j=0;$j<sizeof($table[$i]);$j++){
-                    $data=$table[$i][$j];
+                for($k=0;$k<sizeof($table[$j]);$k++){
+                    $data=$table[$j][$k];
                     $tab.='<td>';
                     $tab.=$data;
                     $tab.='</td>';
@@ -41,6 +39,7 @@ include('database.php');
             $tab.='</table></p>';
             echo $tab;
         }
+
     }
 
     function showOptions($cn,$user_id,$test_id,$ques_id){
