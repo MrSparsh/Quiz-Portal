@@ -16,7 +16,7 @@
         else
         {
             $name=mysqli_fetch_row($rs);
-            $_SESSION['alogin']="true";
+            $_SESSION['alogin']=true;
             $_SESSION['loginid']=$loginid;
             ?>
             <script type="text/javascript">

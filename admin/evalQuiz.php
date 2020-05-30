@@ -1,91 +1,78 @@
 <?php
 session_start();
 require("../database.php");
-
-error_reporting(1);
 ?>
-<link href="../quiz.css" rel="stylesheet" type="text/css">
-<?php
 
-extract($_POST);
-
-echo "<BR>";
-if (!isset($_SESSION['alogin']))
-{
-	echo "<br><h2><div  class=head1>You are not Logged On Please Login to Access this Page</div></h2>";
-	echo "<a href=index.php><h3 align=center>Click Here for Login</h3></a>";
-	exit();
-}
-echo "<BR><h3 class=head1>Evaluate Quiz </h3>";
-
-echo "<table width=100%>";
-echo "<tr><td align=center></table>";
-if($submit=='submit' || strlen($test_id)>0 )
-{
-  //echo ;
-$rs=mysqli_query($cn,"select * from Result where test_id=$test_id");
-if (mysqli_num_rows($rs)<1)
-{
-	echo "<br><br><br><div class=head1>No test is given till now by Students.</div>";
-}else
-{
-  echo "<table border=1 align=center ><tr class=style9><td width=300 align=center>User ID<td>Test ID <td> Test Date<td> Total Questions <td>Attempted <td> Correct <td> Incorrect <td> Score";
-  while($row=mysqli_fetch_row($rs))
-  {
-      $incorrect=$row[4]-$row[5];
-    echo "<tr class=style9><td align=center>$row[0] <td align=center>$row[1] <td align=center> $row[2] <td align=center> $row[3] <td align=center> $row[4]<td align=center> $row[5]<td align=center> $incorrect <td align=center> $row[6] ";
-  }
-  echo "</table>";
-}
-
-$submit="";
-}
-?>
-<table width="100%">
-    <tr>
-        <td aling=right>
-            <?php
-	if(isset($_SESSION['alogin']))
-	{
-	 echo "<div align=\"right\" class=\"style9\" ><strong><a href=\"login.php\">Home </a>|<a href=\"signout.php\"> Signout...</a></strong></div>";
-	 }
-	 else
-	 {
-	 	echo "&nbsp;";
-	 }
-	?>
-        </td>
-    </tr>
-</table>
-<div style="margin:auto;width:90%;height:500px;text-align:left">
-<title>Evaluate Quiz</title>
-    <form name="form1" method="post" onSubmit="return check();">
-        <table width="41%" border="0" align="center">
-            <tr>
-                <td width="45%" height="32">
-                    <div align="center" class="style9"><strong>Enter Test ID </strong></div>
-                </td>
-                <td width="2%" height="5">
-                <td width="53%" height="32">
-                    <input name="test_id" type="text" id="test_id" class=input required>
-            <tr>
-                <td height="26"> </td>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-            </tr>
-            <tr>
-                <td height="26"></td>
-                <td>&nbsp;</td>
-                <td><input type="submit" name="submit" value="Evaluate" class="button1"></td>
-            </tr>
-        </table>
-    </form>
-    <p>&nbsp; </p>
-</div>
 <!DOCTYPE html>
 <head>
+    <title>Evaluate Quiz</title>
+    <link href="css/newstyle.css" rel="stylesheet" type="text/css">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 </head>
 <body background="../img.jpg">
-    
+    <?php
+        include('navbar.php');
+        createNavbar('eval_quiz');
+    ?>
+    <div class="container custom-main-content">
+        <h1 class="display-4 text-center">Evaluate Quiz</h1>
+        <form action="" method="post">
+            <div class="form-group">
+                <label for="test_id">Quiz ID</label>
+                <input type="text" class="form-control" id="test_id" name="test_id"/>
+            </div>
+            <div class="text-center form-group">
+                <input type="submit" id="submit" class="btn btn-primary" name="submit" value="Evaluate"/>
+            <div>
+        </form>
+    </div>
+    <?php
+            extract($_POST);
+            if(isset($submit) && strlen($test_id)>0 ){
+                $rs=mysqli_query($cn,"select * from Result where test_id=$test_id");
+                if (mysqli_num_rows($rs)<1){
+                    echo "<br><h3>No student has given this test yet</h3>";
+                    }else{
+        ?>
+                    <br />
+                    <div class="container">
+                    <table class="table table-striped">
+                        <thead?>
+                            <th>User ID</th>
+                            <th>Test ID</th>
+                            <th>Test Date</th>
+                            <th>Total Questions</th> 
+                            <th>Attempted</th> 
+                            <th>Correct</th> 
+                            <th>Incorrect</th> 
+                            <th>Score</th>
+                        </thead>
+        <?php
+                    while($row=mysqli_fetch_row($rs)){
+                        $incorrect=$row[4]-$row[5];
+        ?>
+                        <tr>
+                            <td><?php echo $row[0] ?></td>
+                            <td><?php echo $row[1] ?></td>
+                            <td><?php echo $row[2] ?></td>
+                            <td><?php echo $row[3] ?></td>
+                            <td><?php echo $row[4] ?></td>
+                            <td><?php echo $row[5] ?></td>
+                            <td><?php echo $incorrect ?></td> 
+                            <td><?php echo $row[6] ?></td>
+                        </tr>
+        <?php  
+                    }
+        ?>
+                    </table>
+                    </div>
+        <?php
+                }
+            }
+        ?>
+    <!-- BootStrap Required Scripts -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
 </body>
 </html>

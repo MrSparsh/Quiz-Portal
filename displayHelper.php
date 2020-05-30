@@ -81,7 +81,7 @@ include('database.php');
         while($img_row=mysqli_fetch_row($img_rs))
         {
             $path = $img_row[3];
-            echo '<img class="img-thumbnail ques-image" src="'.$path.'.jpeg" />';					
+            echo '<img class="img-thumbnail ques-image" src="'.$path.'" />';					
         }
     }
 

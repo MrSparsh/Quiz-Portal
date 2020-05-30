@@ -24,35 +24,33 @@
       if(in_array($file_ext,$extensions)=== false){
          $errors[]="extension not allowed, please choose a docx file for Questions.";
       }
-      
+      mysqli_query($cn,"insert into Test(loginid,Duration,test_password,positive,negative) values ('$_SESSION[loginid]',$duration,'$test_password',$positive,$negative)") ; 
+      $test_id = mysqli_query($cn,"select max(test_id) from test");
+      $test_id = mysqli_fetch_row($test_id);
+      $test_id = $test_id[0];
+      move_uploaded_file($file_tmp,"uploads/".$test_id.".".$file_ext);
+      $zip = new ZipArchive;
+      if(true === $zip->open("uploads/".$test_id.".".$file_ext)) $zip->extractTo("./uploads/".$test_id."/");
       if(empty($errors)==true){
-         echo "No error";
-         move_uploaded_file($file_tmp,"uploads/".$file_name);
-        
-         $ques_arr = read_docx("uploads/".$file_name);
+         $ques_arr = read_docx("uploads/".$test_id.".".$file_ext);
          $n_ques = sizeof($ques_arr);
-         
-         mysqli_query($cn,"insert into Test(loginid,Duration,test_password,positive,negative) values ('$_SESSION[loginid]',$duration,'$test_password',$positive,$negative)") ;
-         
-
-         $test_id1 = mysqli_query($cn,"select max(test_id) from test where loginid = '$_SESSION[loginid]'");
-         $test_id2 = mysqli_fetch_row($test_id1);
-         $test_id = $test_id2[0];
          echo "<p align=center>Test $test_id Added Successfully.</p>";
          $_SESSION['test_id'] = $test_id;
          for($ques_num=1;$ques_num<=sizeof($ques_arr);$ques_num++){
             $ques = $ques_arr[$ques_num-1];
-         // echo "insert into question values($ques_num,'test2','$ques->stat',2,1)".'<br>';
+            echo "insert into Question values($ques_num,$test_id,'$ques->stat',0)".'<br>';
             mysqli_query($cn,"insert into Question values($ques_num,$test_id,'$ques->stat',0)");
             echo $ques->stat."<br/>";
             $tab='';
             
-            foreach($ques->img as $img_no){
-               $img_path = './admin/uploads/'.$actual_filename."/word/media/image".$img_no;
-            //  echo "insert into images values('test2',$ques_num,$img_no,'$img_path')".'<br>';
+            for($i=0;$i<sizeof($ques->img);$i++){
+               $img_no = $i+1;
+               $img_path = './admin/uploads/'.$test_id."/word/".$ques->img[$i];
+               echo "insert into Images values($test_id,$ques_num,$img_no,'$img_path')".'<br>';
                mysqli_query($cn,"insert into Images values($test_id,$ques_num,$img_no,'$img_path')");
-               $tag = '<img src="./uploads/'.$actual_filename."/word/media/image".$img_no.'.jpeg">';
-               echo $tag;
+   ?>
+             <img src="<?php echo './uploads/'.$test_id."/word/".$ques->img[$i] ?>" />
+   <?php
             }
 
             $tab='<table border="1">';
@@ -80,7 +78,7 @@
             }
             echo "<br/>";
             }
-
+            
             // Handling the answer excel sheet
             
             
